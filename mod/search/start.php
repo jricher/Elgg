@@ -37,7 +37,7 @@
 	}
 
 	function search_test_search_hook($hook, $type, $returnvalue, $params) {
-		$ents = get_entities();
+		$ents = get_entities(); // return all entities on the site
 
 		foreach ($ents as $e) {
 			$s = $e->getVolatileData('search');
@@ -48,9 +48,9 @@
 			$e->setVolatileData('search', $s);
 		}
 
-		print_r($ents);
+		//print_r($ents);
 
-		$returnvalue->entities = array_merge($returnvalue->entities, $ents); // return all entities on the site
+		$returnvalue->entities = array_merge($returnvalue->entities, $ents);
 
 		return $returnvalue;
 

@@ -79,7 +79,7 @@
 			$body .= list_entities_from_metadata($md_type, elgg_strtolower($tag), $objecttype, $subtype, $owner_guid_array, 10, false, false);
 			$body = elgg_view_layout('two_column_left_sidebar','',$body);
 		}
-		
+
 		page_draw($title,$body);
 
 ?>
