@@ -36,6 +36,10 @@
 		include_once($CONFIG->path . "mod/search/index.php");
 	}
 
+	/**
+	 * Test search function, adds all known entities to the display with a 
+	 * 'test' search data source.
+	 */
 	function search_test_search_hook($hook, $type, $returnvalue, $params) {
 		$ents = get_entities(); // return all entities on the site
 
@@ -56,6 +60,35 @@
 
 	}
 
+	/**
+	 * Core search hook.
+	 * Checks the core index table for possible matches against the 'string' column.
+	 * Returns an object with two parts:
+	 *    ->entities: an array of instantiated entities that have been decorated with 
+	 *                volatile "search" data indicating what they matched. These are
+	 *                the entities to be displayed to the user on this page.
+	 *    ->table: a data structure keyed on GUID's and contain an array of matching
+	 *                search types. Plugins can use this data to see if they need to
+	 *                add an entity to the search results or decorate an existing result.
+	 */
+	function search_core_hook($hook, $type, $returnvalue, $params) {
+
+	    $tag = $params['tag'];
+	    $page = $params['page']; // replacement for offset
+	    
+
+	    // SELECT guid, GROUP_CONCAT(search_type) FROM search_index GROUP BY guid ORDER BY count(search_type) ??
+
+
+	    return $returnvalue;
+	}
+
+	/**
+	 * indexes an entity to be searchable by the core search system
+	 */
+        function search_index_entity($entity, $type, $string) {
+
+	}
 
 	/** Register init system event **/
 	register_elgg_event_handler('init','system','search_init');
