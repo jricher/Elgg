@@ -28,7 +28,7 @@
 	    if ($vars['search_types'] && is_array($vars['search_types'])) {
 		echo '<div class="searchtypes">Matched: ';
 		foreach ($vars['search_types'] as $st) {
-		    echo '<span class="searchtype">' . $st . '</span> ';
+		    echo '<span class="searchtype">' . elgg_echo('searchtype:' . $st) . '</span> ';
 		}
 		echo '</div>';
 		

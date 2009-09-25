@@ -67,7 +67,9 @@
 		<a href="<?php echo $vars['url']; ?>action/logout"><small><?php echo elgg_echo('logout'); ?></small></a>
 </div>
 
+<div id="elgg_topbar_container_search">
 <?php echo elgg_view('page_elements/searchbox'); ?>
+</div>
 
 </div><!-- /#elgg_topbar -->
 

@@ -47,7 +47,8 @@
 					foreach($entities as $entity) {
  						$ev = elgg_view_entity($entity, $fullview);
 						
-						$html .= elgg_view('search/listing', array('entity_view' => $ev, 'search_types' => $entity->getVolatileData('search')));
+						$html .= elgg_view('search/listing', array('entity_view' => $ev,
+											   'search_types' => $entity->getVolatileData('search')));
 
 					}
 				}
