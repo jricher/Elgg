@@ -9,6 +9,13 @@
 	$nextRound = $CONFIG->wwwroot . 'action/search/progress?offset=' . $newOffset;
 	$content = elgg_echo('search:rebuilding');
 //$content .= "<BR>\nProcessing entity: " . $offset;
+
+        $entities = get_entities('', '', 0, '', $limit, $offset);
+        foreach ($entities as $entity) {
+	    //print 'Processing entity ' . $entity->getGUID() . "<br />\n";
+	}
+
+
 	$reloader = '<script type="text/javascript">
 		$(document).ready(function() {
 			$("#reindex-progress").load("' . $nextRound . '");

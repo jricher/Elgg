@@ -26,14 +26,15 @@
 
 		// TODO: handle deleted entities and clean out the index?
 
-		register_plugin_hook('create', 'user', 'search_index_user_entity');
-		register_plugin_hook('update', 'user', 'search_index_user_entity');
+		// pipe object creation and update through our indexer
+		register_plugin_hook('create', 'all', 'search_call_index_entity');
+		register_plugin_hook('update', 'all', 'search_call_index_entity');
 
-		register_plugin_hook('create', 'group', 'search_index_group_entity');
-		register_plugin_hook('update', 'group', 'search_index_group_entity');
+		register_plugin_hook('index', 'user', 'search_index_user_entity');
 
-		register_plugin_hook('create', 'object', 'search_index_object_entity');
-		register_plugin_hook('update', 'object', 'search_index_object_entity');
+		register_plugin_hook('index', 'group', 'search_index_group_entity');
+
+		register_plugin_hook('index', 'object', 'search_index_object_entity');
 
 		register_plugin_hook('searchtypes', 'all', 'search_base_search_types_hook');
 
@@ -127,6 +128,14 @@
 
 	    return $returnvalue;
 	}
+
+        /**
+	 * listens for object creation and update events and causes an index event to fire on the same object
+	 */
+        function search_call_index_entity($hook, $type, $returnvalue, $params) {
+	    trigger_plugin_hook('index', $type, $returnvalue, $params);
+	}
+
 
         /**
 	 * indexes users based on name, username, and email address
