@@ -11,7 +11,7 @@ $searchtype = get_input('searchtype', 'all');
 // blank the results to start off
 $results = new stdClass();
 $results->entities = array();
-$results->lastpage = 0;
+$results->total = 0;
 
 $title = sprintf(elgg_echo('searchtitle'), $tag); 
 
@@ -39,11 +39,10 @@ if (!empty($tag)) {
 
     $body .= elgg_view_title($title); // elgg_view_title(sprintf(elgg_echo('searchtitle'),$tag));
     $body .= elgg_view('search/startblurb',array('tag' => $tag));
-
     
 
     $body .= elgg_view('search/entity_list',array('entities' => $results->entities,
-						  'count' => $lastpage * $limit, // TODO: this is a stupid hack
+						  'count' => $results->total,
 						  'offset' => $offset,
 						  'limit' => $limit,
 						  'baseurl' => $_SERVER['REQUEST_URI'],

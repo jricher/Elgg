@@ -12,7 +12,7 @@
 		
 		$html = "";
 		$nav = "";
-		
+
 		if (isset($vars['viewtypetoggle'])) {
 			$viewtypetoggle = $vars['viewtypetoggle'];
 		} else {
@@ -52,9 +52,10 @@
 
 					}
 				}
-			} else {
-				if (is_array($entities) && sizeof($entities) > 0)
+			} else if ($viewtype == "gallery") {
+			    if (is_array($entities) && sizeof($entities) > 0) {
 					$html .= elgg_view("search/gallery",array('entities' => $entities));
+			    }
 			}
 			
 			if ($count)

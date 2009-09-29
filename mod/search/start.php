@@ -27,17 +27,18 @@
 		// TODO: handle deleted entities and clean out the index?
 
 		// pipe object creation and update through our indexer
-		register_plugin_hook('create', 'all', 'search_call_index_entity');
-		register_plugin_hook('update', 'all', 'search_call_index_entity');
+		register_elgg_event_handler('create', 'all', 'search_call_index_entity');
+		register_elgg_event_handler('update', 'all', 'search_call_index_entity');
 
-		register_plugin_hook('index', 'user', 'search_index_user_entity');
+		// basic indexes for users, groups, and objects, handled by the core
+		register_elgg_event_handler('index', 'user', 'search_index_user_entity');
+		register_elgg_event_handler('index', 'group', 'search_index_group_entity');
+		register_elgg_event_handler('index', 'object', 'search_index_object_entity');
 
-		register_plugin_hook('index', 'group', 'search_index_group_entity');
-
-		register_plugin_hook('index', 'object', 'search_index_object_entity');
-
+		// list of available search types should include our base parts
 		register_plugin_hook('searchtypes', 'all', 'search_base_search_types_hook');
 
+		// hook to actually index an entity
 		register_plugin_hook('indexentity', 'all', 'search_index_entity_hook');
 
 		extend_view('css', 'search/css');
@@ -46,7 +47,7 @@
 	function search_pagesetup() {
 		global $CONFIG;
 		if (get_context() == 'admin' && isadminloggedin()) {
-		    add_submenu_item(elgg_echo('search:rebuildmenu'), $CONFIG->wwwroot . 'mod/search/reindex.php');
+		    add_submenu_item(elgg_echo('search:rebuild:menu'), $CONFIG->wwwroot . 'mod/search/reindex.php');
 		}
 	}
 
@@ -86,6 +87,11 @@
 	 * 'test' search data source.
 	 */
 	function search_test_search_hook($hook, $type, $returnvalue, $params) {
+		$count = $returnvalue->total; // current count
+		$limit = $params['limit'];
+		$offset = $params['offset'];
+		$searchtype = $params['searchtype'];
+
 		$ents = get_entities(); // return all entities on the site
 
 		foreach ($ents as $e) {
@@ -97,6 +103,16 @@
 			$e->setVolatileData('search', $s);
 		}
 
+		// stretch the display if needed
+		if (count($ents) > $count) {
+			$returnvalue->total = count($ents);
+		}
+
+		if (count($ents) > $limit) {
+			$ents = array_slice($ents, $offset, $limit);
+		}
+		
+		
 		//print_r($ents);
 
 		$returnvalue->entities = array_merge($returnvalue->entities, $ents);
@@ -132,60 +148,54 @@
         /**
 	 * listens for object creation and update events and causes an index event to fire on the same object
 	 */
-        function search_call_index_entity($hook, $type, $returnvalue, $params) {
-	    trigger_plugin_hook('index', $type, $returnvalue, $params);
+        function search_call_index_entity($event, $object_type, $object) {
+	    trigger_elgg_event('index', $object_type, $object);
 	}
 
 
         /**
 	 * indexes users based on name, username, and email address
 	 */
-        function search_index_user_entity($hook, $type, $returnvalue, $params) {
-	    $entity = $params['entity'];
-
+        function search_index_user_entity($event, $object_type, $object) {
 	    // index name
-	    trigger_plugin_hook('indexentity', '', array('entity' => $entity,
+	    trigger_plugin_hook('indexentity', '', array('entity' => $object,
 							 'searchtype' => 'name',
 							 'searchstring' => $entity->name));
-	    trigger_plugin_hook('indexentity', '', array('entity' => $entity,
+	    trigger_plugin_hook('indexentity', '', array('entity' => $object,
 							 'searchtype' => 'email',
 							 'searchstring' => $entity->email));
-	    trigger_plugin_hook('indexentity', '', array('entity' => $entity,
+	    trigger_plugin_hook('indexentity', '', array('entity' => $object,
 							 'searchtype' => 'username',
 							 'searchstring' => $entity->username));
-	    return $returnvalue;
+	    return true;
         }
 
         /**
 	 * indexes groups based on name and description
 	 */
-        function search_index_group_entity($hook, $type, $returnvalue, $params) {
-	    $entity = $params['entity'];
-
+	function search_index_group_entity($event, $object_type, $object) {
 	    // index name
-	    trigger_plugin_hook('indexentity', '', array('entity' => $entity,
+	    trigger_plugin_hook('indexentity', '', array('entity' => $object,
 							 'searchtype' => 'name',
 							 'searchstring' => $entity->name));
-	    trigger_plugin_hook('indexentity', '', array('entity' => $entity,
+	    trigger_plugin_hook('indexentity', '', array('entity' => $object,
 							 'searchtype' => 'description',
 							 'searchstring' => $entity->description));
-	    return $returnvalue;
+	    return true;
         }
 
         /**
 	 * indexes objects based on title and description
 	 */
-        function search_index_object_entity($hook, $type, $returnvalue, $params) {
-	    $entity = $params['entity'];
-
+	function search_index_object_entity($event, $object_type, $object) {
 	    // index name
-	    trigger_plugin_hook('indexentity', '', array('entity' => $entity,
+	    trigger_plugin_hook('indexentity', '', array('entity' => $object,
 							 'searchtype' => 'title',
 							 'searchstring' => $entity->title));
-	    trigger_plugin_hook('indexentity', '', array('entity' => $entity,
+	    trigger_plugin_hook('indexentity', '', array('entity' => $object,
 							 'searchtype' => 'description',
 							 'searchstring' => $entity->description));
-	    return $returnvalue;
+	    return true;
         }
 
 	/**
@@ -196,8 +206,13 @@
 	    $searchtype = $params['searchtype'];
 	    $string = $params['searchstring'];
 
+	    // INSERT INTO es_search_index (guid, search_source, string) VALUES (1, 'bar', 'foo bar the bob the bbz') ON DUPLICATE KEY UPDATE string='pants?'
+
 	    // DELETE FROM SEARCH TABLE WHERE FOO BAR
 	    // INSERT INTO SEARCH TABLE FOO BAR
+
+	    //usleep(1000);
+	    sleep(1);
 
 	    return $returnvalue;
 	}
