@@ -212,7 +212,7 @@
 	    // INSERT INTO SEARCH TABLE FOO BAR
 
 	    //usleep(1000);
-	    sleep(1);
+	    // sleep(1);
 
 	    return $returnvalue;
 	}
