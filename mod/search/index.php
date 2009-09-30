@@ -28,11 +28,12 @@ if (!empty($tag)) {
     add_submenu_item(elgg_echo('searchtype:all'),
 		     $CONFIG->wwwroot . "pg/search/?tag=". urlencode($tag) ."&searchtype=all");
 		     
+    
     foreach ($searchtypes as $st) {
 	add_submenu_item(elgg_echo('searchtype:' . $st),
 			 $CONFIG->wwwroot . "pg/search/?tag=". urlencode($tag) ."&searchtype=" . $st);
     }
-
+    
     
 
     //print_r($results);

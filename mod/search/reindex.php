@@ -12,6 +12,16 @@
 	$indexSize = search_get_index_size();
 	$progressBar = $CONFIG->wwwroot . 'action/search/progress?offset=0&limit=10';
 
+	if (get_input('noajax')==true) {
+		// NJR Manual Override Ajax Index
+		$entities = get_entities('', '', 0, '', 1000, 0);
+	    foreach ($entities as $entity) {
+	       	print 'Processing entity ' . $entity->getGUID() . "<br />\n";
+	        trigger_elgg_event('index', $entity->getType(), $entity);
+		}
+		// End NJR Manual Override
+	}
+
 // stolen from the admin views, might want to go into its own thing?
 // really, those need to be made available elsewhere...
 
@@ -30,12 +40,12 @@
     </table> 
 </div>';
 
-
 	$content .= '<input type="submit" id="reindex-button" value="' . elgg_echo('search:rebuild:go') . '" /><BR>' . "\n";
 	$content .= '<span id="reindex-working" class="cancel_button">' . elgg_echo('search:rebuild:working') . '</span>' . "\n";
 	$content .= '<span id="reindex-progressBar" class="progressBar"></span><BR>' . "\n";
 	$content .= '<span id="reindex-progress"></span> ';
-	$content .= '<script type="text/javascript" src="' . $CONFIG->wwwroot . 'mod/search/jquery.progressbar.js"></script><script type="text/javascript">
+	$content .= '<script type="text/javascript" src="' . $CONFIG->wwwroot . 'mod/search/jquery.progressbar.min.js"></script>';
+	$content .= '<script type="text/javascript">
 		
 		function search_AjaxLoader(event) {
 			event.preventDefault();
@@ -49,13 +59,19 @@
 		$(document).ready(function() {
 			$("#reindex-button").click(search_AjaxLoader);
 			$("#reindex-working").hide();
-			$("#reindex-progressBar").progressBar({max: ' . $totalEntities . ', textFormat: \'fraction\' });
+			$("#reindex-progressBar").progressBar({max: ' . $totalEntities . ', textFormat: \'fraction\', 
+												   boxImage: \'' . $CONFIG->wwwroot . 'mod/search/graphics/progressbar.gif\', 
+												   barImage: {0: \'' . $CONFIG->wwwroot . 'mod/search/graphics/progressbg_yellow.gif\', 
+															  30: \'' . $CONFIG->wwwroot . 'mod/search/graphics/progressbg_orange.gif\', 
+															  70: \'' . $CONFIG->wwwroot . 'mod/search/graphics/progressbg_green.gif\'} 
+												  });
 		});
 
 	</script>';
 
 
 	$body .= elgg_view('page_elements/contentwrapper', array('body' => $content));
+
 	
 	page_draw(elgg_echo('search:rebuild:title'), elgg_view_layout("two_column_left_sidebar", '', $title . $body));
 
