@@ -156,10 +156,10 @@
 	}
 	
 	function search_original_hook($hook, $type, $returnvalue, $params) {
-	    $tag = $params['tag'];
-	    $offset = $params['offset']; // starting page
-	    $limit = $params['limit']; // number per page
-	    $searchtype = $params['searchtype']; // the search type we're looking for
+	    	$tag = $params['tag'];
+		$offset = $params['offset']; // starting page
+		$limit = $params['limit']; // number per page
+		$searchtype = $params['searchtype']; // the search type we're looking for
 		$object_type = $params['object_type'];
 		$subtype = $params['subtype'];
 		$owner_guid = $params['owner_guid'];
@@ -169,17 +169,19 @@
 		$ents =  get_entities_from_metadata($tagtype, elgg_strtolower($tag), $object_type, $subtype, $owner_guid, $limit, $offset, "", 0, false);	
 
 
-		## Foreach entity
-		#	get the metadata keys
-		#	If the value matches, hang onto the key
-		#	add all the matched keys to VolatileData
+		/*
+		 * Foreach entity
+		 *	get the metadata keys
+		 *	If the value matches, hang onto the key
+		 *	add all the matched keys to VolatileData
+		 */
 		foreach ($ents as $ent) {
-			$metadata = get_metadata_for_entity($ent->guid);
+		    	$metadata = get_metadata_for_entity($ent->getGUID());
+			$matched = array();
 			if ($metadata) {
-				$matched = array();
 				foreach ($metadata as $tuple) {
-					if ($tuple->value == $tag) {
-						# This is one of the matching elements
+					if ($tag === $tuple->value) {
+						// This is one of the matching elements
 						$matched[] = $tuple->name;
 					}
 				}
@@ -187,12 +189,12 @@
 			}
 		}
 		
-	    $returnvalue->entities = array_merge($returnvalue->entities, $ents);
-	    if ($count > $returnvalue->total) {
-			$returnvalue->total = $count;
-	    }
+		$returnvalue->entities = array_merge($returnvalue->entities, $ents);
+		if ($count > $returnvalue->total) {
+		    	$returnvalue->total = $count;
+		}
 
-	    return $returnvalue;
+		return $returnvalue;
 	}
 
 	/**
