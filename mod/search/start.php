@@ -24,7 +24,7 @@
 
 		//register_plugin_hook('searchentities', 'all', 'search_test_search_hook');
 
-		register_plugin_hook('searchentities', 'all', 'search_core_hook');
+		register_plugin_hook('search:entities', 'all', 'search_original_hook');
 
 		// TODO: handle deleted entities and clean out the index?
 
@@ -150,6 +150,27 @@
 	    $returnvalue->entities = array_merge($returnvalue->entities, $ents);
 	    if ($count > $returnvalue->total) {
 		$returnvalue->total = $count;
+	    }
+
+	    return $returnvalue;
+	}
+	
+	function search_original_hook($hook, $type, $returnvalue, $params) {
+	    $tag = $params['tag'];
+	    $offset = $params['offset']; // starting page
+	    $limit = $params['limit']; // number per page
+	    $searchtype = $params['searchtype']; // the search type we're looking for
+		$object_type = $params['object_type'];
+		$subtype = $params['subtype'];
+		$owner_guid = $params['owner_guid'];
+		$tagtype = $params['tagtype'];
+		
+		$count = get_entities_from_metadata($tagtype, elgg_strtolower($tag), $object_type, $subtype, $owner_guid, $limit, $offset, "", 0, true); 
+		$ents =  get_entities_from_metadata($tagtype, elgg_strtolower($tag), $object_type, $subtype, $owner_guid, $limit, $offset, "", 0, false);	
+
+	    $returnvalue->entities = array_merge($returnvalue->entities, $ents);
+	    if ($count > $returnvalue->total) {
+			$returnvalue->total = $count;
 	    }
 
 	    return $returnvalue;
