@@ -168,6 +168,25 @@
 		$count = get_entities_from_metadata($tagtype, elgg_strtolower($tag), $object_type, $subtype, $owner_guid, $limit, $offset, "", 0, true); 
 		$ents =  get_entities_from_metadata($tagtype, elgg_strtolower($tag), $object_type, $subtype, $owner_guid, $limit, $offset, "", 0, false);	
 
+
+		## Foreach entity
+		#	get the metadata keys
+		#	If the value matches, hang onto the key
+		#	add all the matched keys to VolatileData
+		foreach ($ents as $ent) {
+			$metadata = get_metadata_for_entity($ent->guid);
+			if ($metadata) {
+				$matched = array();
+				foreach ($metadata as $tuple) {
+					if ($tuple->value == $tag) {
+						# This is one of the matching elements
+						$matched[] = $tuple->name;
+					}
+				}
+				$ent->setVolatileData("search", $matched);
+			}
+		}
+		
 	    $returnvalue->entities = array_merge($returnvalue->entities, $ents);
 	    if ($count > $returnvalue->total) {
 			$returnvalue->total = $count;
