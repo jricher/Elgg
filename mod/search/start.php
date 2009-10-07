@@ -72,6 +72,7 @@
 		 *	get the metadata keys
 		 *	If the value matches, hang onto the key
 		 *	add all the matched keys to VolatileData
+		 *   This tells us *why* each entity matched
 		 */
 		foreach ($ents as $ent) {
 		    	$metadata = get_metadata_for_entity($ent->getGUID());
